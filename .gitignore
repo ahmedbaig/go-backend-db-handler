@@ -1,0 +1,8 @@
+*.out
+coverage.*
+.idea/
+.vscode/
+.DS_Store
+var/
+*.db
+/bin/

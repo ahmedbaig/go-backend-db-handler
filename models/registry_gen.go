@@ -1,0 +1,17 @@
+package models
+
+import (
+	"github.com/ahmedbaig/go-backend-db-handler/internal/registry"
+	"github.com/ahmedbaig/go-backend-db-handler/models/demo"
+)
+
+func Register(r *registry.Registry) {
+	r.Add("demo", "authors", &demo.Author{})
+	r.Add("demo", "posts", &demo.Post{})
+}
+
+func All() map[string][]any {
+	return map[string][]any{
+		"demo": {&demo.Author{}, &demo.Post{}},
+	}
+}
