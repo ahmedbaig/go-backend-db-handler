@@ -4,12 +4,15 @@ go 1.27.3
 
 require (
 	github.com/ahmedbaig/go-backend-config v0.1.0
-	github.com/ahmedbaig/go-backend-db v0.1.0
-	github.com/ahmedbaig/go-backend-http v0.1.0
+	github.com/ahmedbaig/go-backend-db v0.2.0
+	github.com/ahmedbaig/go-backend-http v0.2.0
 	github.com/ahmedbaig/go-backend-logging v0.1.0
 	github.com/ahmedbaig/go-backend-monitoring v0.1.0
 	github.com/ahmedbaig/go-backend-testing v0.1.0
+	github.com/alicebob/miniredis/v2 v2.40.0
 	github.com/glebarez/sqlite v1.11.0
+	github.com/redis/go-redis/v9 v9.23.0
+	go.mongodb.org/mongo-driver/v2 v2.10.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.6.3
 	gorm.io/driver/sqlserver v1.6.4
@@ -18,7 +21,8 @@ require (
 )
 
 require (
-	filippo.io/edwards25519 v1.1.0 // indirect
+	filippo.io/edwards25519 v1.1.1 // indirect
+	github.com/ahmedbaig/go-backend-types v0.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -37,6 +41,7 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/klauspost/compress v1.20.3 // indirect
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/microsoft/go-mssqldb v1.9.6 // indirect
@@ -47,6 +52,11 @@ require (
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
+	github.com/xdg-go/scram v1.4.0 // indirect
+	github.com/xdg-go/stringprep v1.0.4 // indirect
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
+	github.com/yuin/gopher-lua v1.1.1 // indirect
+	go.uber.org/atomic v1.12.0 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3 // indirect
 	golang.org/x/mod v0.41.0 // indirect

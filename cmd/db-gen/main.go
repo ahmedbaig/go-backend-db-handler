@@ -29,9 +29,20 @@ func main() {
 	name := flag.String("name", "db-handler", "config name; reads <name>-db.json from CONFIG_DIR")
 	out := flag.String("out", "models", "output directory for generated models")
 	only := flag.String("database", "", "generate only this database")
+	typesDir := flag.String("types", "types", "output directory for the shared types module")
+	typesOnly := flag.Bool("types-only", false, "skip introspection; regenerate registry and types from existing models")
 	flag.Parse()
 
-	if err := run(*name, *out, *only); err != nil {
+	var err error
+	if *typesOnly {
+		err = writeRegistry(*out)
+	} else {
+		err = run(*name, *out, *only)
+	}
+	if err == nil {
+		err = writeTypes(*out, *typesDir)
+	}
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "db-gen:", err)
 		os.Exit(1)
 	}

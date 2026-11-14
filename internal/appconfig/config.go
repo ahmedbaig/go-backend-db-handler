@@ -44,11 +44,51 @@ type Connection struct {
 	Default         bool              `json:"default"`
 }
 
+type RedisStore struct {
+	Name     string          `json:"name" validate:"required"`
+	Addr     string          `json:"addr"`
+	URL      string          `json:"url"`
+	Username string          `json:"username"`
+	Password string          `json:"password"`
+	DB       int             `json:"db" validate:"min=0"`
+	TLS      bool            `json:"tls"`
+	Prefix   string          `json:"prefix"`
+	PoolSize int             `json:"poolSize" validate:"min=0"`
+	Timeout  config.Duration `json:"timeout"`
+}
+
+type MongoStore struct {
+	Name        string          `json:"name" validate:"required"`
+	URI         string          `json:"uri" validate:"required"`
+	Database    string          `json:"database" validate:"required"`
+	Collections []string        `json:"collections"`
+	MaxLimit    int64           `json:"maxLimit" validate:"min=0"`
+	Timeout     config.Duration `json:"timeout"`
+}
+
 type DB struct {
 	Connections []Connection `json:"connections" validate:"dive"`
+	Redis       []RedisStore `json:"redis" validate:"dive"`
+	Mongo       []MongoStore `json:"mongo" validate:"dive"`
 }
 
 func (d DB) Validate() error {
+	stores := map[string]bool{}
+	for _, r := range d.Redis {
+		if stores[r.Name] {
+			return fmt.Errorf("store %s is defined twice", r.Name)
+		}
+		stores[r.Name] = true
+		if r.Addr == "" && r.URL == "" {
+			return fmt.Errorf("redis store %s needs addr or url", r.Name)
+		}
+	}
+	for _, m := range d.Mongo {
+		if stores[m.Name] {
+			return fmt.Errorf("store %s is defined twice", m.Name)
+		}
+		stores[m.Name] = true
+	}
 	seen := map[string]bool{}
 	for _, c := range d.Connections {
 		key := c.Database + "@" + c.Instance

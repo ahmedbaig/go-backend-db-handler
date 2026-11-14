@@ -10,7 +10,9 @@ import (
 	"github.com/ahmedbaig/go-backend-db-handler/internal/api"
 	"github.com/ahmedbaig/go-backend-db-handler/internal/appconfig"
 	"github.com/ahmedbaig/go-backend-db-handler/internal/connections"
+	"github.com/ahmedbaig/go-backend-db-handler/internal/docs"
 	"github.com/ahmedbaig/go-backend-db-handler/internal/engine"
+	"github.com/ahmedbaig/go-backend-db-handler/internal/kv"
 	"github.com/ahmedbaig/go-backend-db-handler/internal/registry"
 	"github.com/ahmedbaig/go-backend-db-handler/models"
 	"github.com/ahmedbaig/go-backend-http"
@@ -57,9 +59,23 @@ func run(ctx context.Context) error {
 		return err
 	}
 
-	prober := monitoring.NewProber(name, monitoring.WithVersion(version))
-	if err := pool.RegisterProbes(prober); err != nil {
+	kvPool, err := kv.Open(ctx, dbCfg.Redis, log.Logger)
+	if err != nil {
 		return err
+	}
+	docPool, err := docs.Open(ctx, dbCfg.Mongo, log.Logger)
+	if err != nil {
+		return err
+	}
+	if err := docPool.EnsureIndexes(ctx); err != nil {
+		log.Warn("could not create analytics indexes", logging.Err(err))
+	}
+
+	prober := monitoring.NewProber(name, monitoring.WithVersion(version))
+	for _, reg := range []func(*monitoring.Prober) error{pool.RegisterProbes, kvPool.RegisterProbes, docPool.RegisterProbes} {
+		if err := reg(prober); err != nil {
+			return err
+		}
 	}
 
 	app := httpx.New(httpx.Options{
@@ -74,8 +90,12 @@ func run(ctx context.Context) error {
 		Engine:   engine.New(reg, pool, engine.Options{DefaultTake: cfg.DefaultTake, MaxTake: cfg.MaxTake}),
 		Registry: reg,
 		Pool:     pool,
+		KV:       kvPool,
+		Docs:     docPool,
 		APIKeys:  cfg.APIKeys,
 	})
 	app.OnShutdown(func(context.Context) error { return pool.Close() })
+	app.OnShutdown(func(context.Context) error { return kvPool.Close() })
+	app.OnShutdown(func(context.Context) error { return docPool.Close() })
 	return app.Run(ctx, cfg.Addr())
 }

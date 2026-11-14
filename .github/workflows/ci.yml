@@ -7,10 +7,32 @@ on:
 jobs:
   test:
     uses: ahmedbaig/go-backend-pipelines/.github/workflows/go-ci.yml@main
+  types:
+    uses: ahmedbaig/go-backend-pipelines/.github/workflows/go-ci.yml@main
+    with:
+      working-directory: types
   docker:
-    needs: test
+    needs: [test, types, mongo-integration]
     if: github.event_name == 'push'
     uses: ahmedbaig/go-backend-pipelines/.github/workflows/docker.yml@main
     permissions:
       contents: read
       packages: write
+  mongo-integration:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:8
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1}).ok'"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          check-latest: true
+      - run: go test -race -run 'Mongo' -v ./internal/api/
+        env:
+          MONGO_TEST_URI: mongodb://localhost:27017

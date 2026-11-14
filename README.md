@@ -28,7 +28,10 @@ You don't write model code. `db-gen` connects to every database in the config, r
 ```sh
 CONFIG_DIR=./configs go run ./cmd/db-gen            # all databases
 CONFIG_DIR=./configs go run ./cmd/db-gen -database shop
+go run ./cmd/db-gen -types-only                     # registry + types from existing models
 ```
+
+It also writes the shared **types module** (`types/`, module `github.com/ahmedbaig/go-backend-db-handler/types`): plain structs, field and relation name constants and a typed service per table, with no GORM dependency. Services import that instead of re-declaring tables. Release it with a `types/vX.Y.Z` tag.
 
 Rebuild the service and the new tables are live: no handlers, routes or SQL to add. Handwritten model packages (like `models/demo`) are picked up too, as long as each struct has a `TableName()` method and the package has a `Database` constant.
 
@@ -60,12 +63,28 @@ curl -s localhost:8090/api/v1/demo/posts/findMany -H "X-Api-Key: $DB_HANDLER_API
 - Unique and foreign key violations become 409; everything else unexpected is a logged 500.
 - Optional `X-Api-Key` check; services can be registered read-only.
 
+## Redis and Mongo stores
+
+Besides SQL, the handler owns key-value state in Redis and documents in Mongo. Services reach both through the same API and client, so sessions and analytics never need their own connections.
+
+| Route | |
+|---|---|
+| `POST /api/v1/kv/{store}/{op}` | Redis: `get` (with `touch` + `ttlMs` for sliding expiry), `mget`, `set` (`ttlMs`, `nx`, `xx`), `del`, `expire`, `ttl`, `incr` (`by`, `ttlMs`), `publish` |
+| `POST /api/v1/docs/{store}/{collection}/{op}` | Mongo: `insert`, `find`, `findOne`, `count`, `aggregate`, `update` (`many`, `upsert`), `delete` (`many`) |
+| `POST /api/v1/analytics/{store}/track` | store events in `events`, upsert one `daily_active_users` doc per user per day |
+| `GET /api/v1/analytics/{store}/dau?from=&to=` | daily active users per day |
+
+- Redis keys and channels get the store's `prefix`. Values are JSON, up to 1 MiB.
+- Mongo filters, sorts, projections and pipelines are Mongo extended JSON (`{"$date": ...}`, `{"$oid": ...}`). `$where`, `$function`, `$accumulator`, `$out` and `$merge` are rejected anywhere in the request. Updates must use update operators; update and delete need a filter; `find` defaults to 100 and is capped at `maxLimit`; aggregations get a `$limit` if they have none.
+- `collections` on a Mongo store restricts which collections are exposed.
+- Each store gets a health probe (`redis:<name>`, `mongo:<name>`) and appears in `/api/v1/capabilities`.
+
 ## Configuration
 
 Three JSON files in `CONFIG_DIR` (or `DB_HANDLER_SECRET`, `DB_HANDLER_DB_SECRET`, `DB_HANDLER_LOGGER_SECRET` env vars), see `configs/*.sample`:
 
 - `db-handler.json`: port, environment, request timeout, `defaultTake`, `maxTake`, `apiKeys`
-- `db-handler-db.json`: connections. Each has a logical `database` name, optional `instance`, `driver` (`postgres`, `mysql`, `sqlserver`, `sqlite`), either `dsn` or host/port/user/password/name/params, and pool settings. Several connections can share a database name with different instances; `default: true` picks the one used when a query names no instance.
+- `db-handler-db.json`: `connections` (SQL), `redis` (name, addr or url, password, db, tls, prefix, poolSize, timeout) and `mongo` (name, uri, database, collections, maxLimit, timeout). SQL connections: Each has a logical `database` name, optional `instance`, `driver` (`postgres`, `mysql`, `sqlserver`, `sqlite`), either `dsn` or host/port/user/password/name/params, and pool settings. Several connections can share a database name with different instances; `default: true` picks the one used when a query names no instance.
 - `db-handler-logger.json`: see go-backend-logging
 
 ## Run

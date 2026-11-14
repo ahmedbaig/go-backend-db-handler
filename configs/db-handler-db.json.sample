@@ -1,19 +1,66 @@
 {
   "connections": [
-    { "database": "demo", "driver": "sqlite", "name": "var/demo.db?_pragma=foreign_keys(1)" },
     {
-      "database": "shop", "instance": "au", "default": true, "driver": "postgres",
-      "host": "localhost", "port": 5432, "user": "shop", "password": "change-me", "name": "shop",
-      "params": { "sslmode": "disable" },
-      "maxOpenConns": 20, "maxIdleConns": 5, "connMaxLifetime": "30m", "slowQuery": "500ms"
+      "database": "demo",
+      "driver": "sqlite",
+      "name": "var/demo.db?_pragma=foreign_keys(1)"
     },
     {
-      "database": "shop", "instance": "nz", "driver": "postgres",
-      "host": "localhost", "port": 5433, "user": "shop", "password": "change-me", "name": "shop"
+      "database": "shop",
+      "instance": "au",
+      "default": true,
+      "driver": "postgres",
+      "host": "localhost",
+      "port": 5432,
+      "user": "shop",
+      "password": "change-me",
+      "name": "shop",
+      "params": {
+        "sslmode": "disable"
+      },
+      "maxOpenConns": 20,
+      "maxIdleConns": 5,
+      "connMaxLifetime": "30m",
+      "slowQuery": "500ms"
     },
     {
-      "database": "legacy", "driver": "mysql",
-      "host": "localhost", "port": 3306, "user": "app", "password": "change-me", "name": "legacy"
+      "database": "shop",
+      "instance": "nz",
+      "driver": "postgres",
+      "host": "localhost",
+      "port": 5433,
+      "user": "shop",
+      "password": "change-me",
+      "name": "shop"
+    },
+    {
+      "database": "legacy",
+      "driver": "mysql",
+      "host": "localhost",
+      "port": 3306,
+      "user": "app",
+      "password": "change-me",
+      "name": "legacy"
+    }
+  ],
+  "redis": [
+    {
+      "name": "sessions",
+      "addr": "localhost:6379",
+      "password": "",
+      "db": 0,
+      "prefix": "app:",
+      "poolSize": 20,
+      "timeout": "3s"
+    }
+  ],
+  "mongo": [
+    {
+      "name": "analytics",
+      "uri": "mongodb://localhost:27017",
+      "database": "analytics",
+      "maxLimit": 1000,
+      "timeout": "10s"
     }
   ]
 }
