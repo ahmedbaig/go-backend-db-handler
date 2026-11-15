@@ -52,6 +52,20 @@ curl -s localhost:8090/api/v1/demo/posts/findMany -H "X-Api-Key: $DB_HANDLER_API
   -d '{"where":{"published":true},"orderBy":[{"field":"id","direction":"desc"}],"take":10,"include":["author"]}'
 ```
 
+### gRPC
+
+The same operations are served over gRPC on `grpcPort` (default 9090, `0` turns it off), using `DBHandlerService` from [go-backend-proto](https://github.com/ahmedbaig/go-backend-proto). `apiKeys` are accepted as `authorization: Bearer <key>`. Request and correlation IDs, the calling user and errors cross the hop intact, and validation is identical to the REST routes. Reflection is on in `localhost` only.
+
+```go
+c, conn, err := dbgrpc.Dial("db-handler:9090", grpcx.ClientOptions{ServiceToken: key})
+posts := db.NewService[demo.Post](c, "demo", "posts")
+```
+
+```sh
+grpcurl -plaintext -H "authorization: Bearer $DB_HANDLER_API_KEY" \
+  -d '{"database":"demo","service":"posts","method":"count"}' localhost:9090 ahmedbaig.dbhandler.v1.DBHandlerService/Query
+```
+
 ## Safety rules
 
 - Every field name in `where`, `select`, `orderBy`, `data` and `conflict` must exist on the model (JSON name, Go name or column name). Columns are always quoted by GORM, values are always bound parameters.
@@ -83,7 +97,7 @@ Besides SQL, the handler owns key-value state in Redis and documents in Mongo. S
 
 Three JSON files in `CONFIG_DIR` (or `DB_HANDLER_SECRET`, `DB_HANDLER_DB_SECRET`, `DB_HANDLER_LOGGER_SECRET` env vars), see `configs/*.sample`:
 
-- `db-handler.json`: port, environment, request timeout, `defaultTake`, `maxTake`, `apiKeys`
+- `db-handler.json`: port, `grpcPort`, environment, request timeout, `defaultTake`, `maxTake`, `apiKeys`
 - `db-handler-db.json`: `connections` (SQL), `redis` (name, addr or url, password, db, tls, prefix, poolSize, timeout) and `mongo` (name, uri, database, collections, maxLimit, timeout). SQL connections: Each has a logical `database` name, optional `instance`, `driver` (`postgres`, `mysql`, `sqlserver`, `sqlite`), either `dsn` or host/port/user/password/name/params, and pool settings. Several connections can share a database name with different instances; `default: true` picks the one used when a query names no instance.
 - `db-handler-logger.json`: see go-backend-logging
 

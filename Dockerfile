@@ -18,7 +18,7 @@ ENV TZ=${TZ} CONFIG_DIR=/app/var/secrets PORT=8090
 WORKDIR /app
 COPY --from=build /out/app /app/app
 USER 10001:10001
-EXPOSE 8090
+EXPOSE 8090 9090
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD ["/bin/sh", "-c", "wget -qO- http://127.0.0.1:${PORT}/healthz >/dev/null || exit 1"]
 ENTRYPOINT ["/sbin/tini", "--"]

@@ -17,13 +17,16 @@ type App struct {
 	DefaultTake    int             `json:"defaultTake" validate:"min=0"`
 	MaxTake        int             `json:"maxTake" validate:"min=0"`
 	APIKeys        []string        `json:"apiKeys"`
+	GRPCPort       int             `json:"grpcPort" validate:"min=0,max=65535"`
 }
 
 func DefaultApp() App {
-	return App{Port: 8090, Host: "0.0.0.0", Environment: "production", RequestTimeout: config.Duration(30e9), DefaultTake: 100, MaxTake: 1000}
+	return App{Port: 8090, Host: "0.0.0.0", Environment: "production", RequestTimeout: config.Duration(30e9), DefaultTake: 100, MaxTake: 1000, GRPCPort: 9090}
 }
 
 func (a App) Addr() string { return net.JoinHostPort(a.Host, strconv.Itoa(a.Port)) }
+
+func (a App) GRPCAddr() string { return net.JoinHostPort(a.Host, strconv.Itoa(a.GRPCPort)) }
 
 type Connection struct {
 	Database        string            `json:"database" validate:"required"`

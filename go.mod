@@ -4,15 +4,17 @@ go 1.27.3
 
 require (
 	github.com/ahmedbaig/go-backend-config v0.1.0
-	github.com/ahmedbaig/go-backend-db v0.2.0
-	github.com/ahmedbaig/go-backend-http v0.2.0
+	github.com/ahmedbaig/go-backend-db v0.3.0
+	github.com/ahmedbaig/go-backend-http v0.3.0
 	github.com/ahmedbaig/go-backend-logging v0.1.0
 	github.com/ahmedbaig/go-backend-monitoring v0.1.0
+	github.com/ahmedbaig/go-backend-proto v0.1.0
 	github.com/ahmedbaig/go-backend-testing v0.1.0
 	github.com/alicebob/miniredis/v2 v2.40.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/redis/go-redis/v9 v9.23.0
 	go.mongodb.org/mongo-driver/v2 v2.10.0
+	google.golang.org/grpc v1.85.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.6.3
 	gorm.io/driver/sqlserver v1.6.4
@@ -60,11 +62,13 @@ require (
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3 // indirect
 	golang.org/x/mod v0.41.0 // indirect
+	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	golang.org/x/tools v0.51.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260817212433-ac3dfec99bb1 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gorm.io/datatypes v1.2.4 // indirect
 	gorm.io/hints v1.1.0 // indirect
