@@ -5,10 +5,10 @@ go 1.27.3
 require (
 	github.com/ahmedbaig/go-backend-config v0.1.0
 	github.com/ahmedbaig/go-backend-db v0.3.0
-	github.com/ahmedbaig/go-backend-http v0.3.0
-	github.com/ahmedbaig/go-backend-logging v0.1.0
+	github.com/ahmedbaig/go-backend-http v0.4.0
+	github.com/ahmedbaig/go-backend-logging v0.2.0
 	github.com/ahmedbaig/go-backend-monitoring v0.1.0
-	github.com/ahmedbaig/go-backend-proto v0.1.0
+	github.com/ahmedbaig/go-backend-proto v0.2.0
 	github.com/ahmedbaig/go-backend-testing v0.1.0
 	github.com/alicebob/miniredis/v2 v2.40.0
 	github.com/glebarez/sqlite v1.11.0
